@@ -1,118 +1,29 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Monitoring Longsor Realtime</title>
-  <!-- Library Grafik Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Arial, sans-serif;
-    }
-
-    body {
-      background-color: #f0f2f5;
-      color: #333;
-      padding: 20px;
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 25px;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .header h1 {
-      color: #d9534f;
-      margin-bottom: 8px;
-      font-size: 22px;
-    }
-
-    .header p {
-      color: #666;
-      font-size: 14px;
-    }
-
-    .grid-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 20px;
-      margin-bottom: 25px;
-    }
-
-    .card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .card h2 {
-      font-size: 15px;
-      margin-bottom: 15px;
-      color: #444;
-      border-bottom: 2px solid #eee;
-      padding-bottom: 8px;
-    }
-
-    .table-container {
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      text-align: left;
-      font-size: 13px;
-    }
-
-    th,
-    td {
-      padding: 10px 12px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #f8f9fa;
-      color: #555;
-    }
-
-    .badge {
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-weight: bold;
-      font-size: 11px;
-      color: white;
-      display: inline-block;
-    }
-
-    .badge-aman {
-      background-color: #28a745;
-    }
-
-    .badge-siaga {
-      background-color: #ffc107;
-      color: #333;
-    }
-
-    .badge-bahaya {
-      background-color: #dc3545;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+    body { background-color: #f0f2f5; color: #333; padding: 20px; }
+    .header { text-align: center; margin-bottom: 25px; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .header h1 { color: #d9534f; margin-bottom: 8px; font-size: 22px; }
+    .header p { color: #666; font-size: 14px; }
+    .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; margin-bottom: 25px; }
+    .card { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+    .card h2 { font-size: 15px; margin-bottom: 15px; color: #444; border-bottom: 2px solid #eee; padding-bottom: 8px; }
+    .table-container { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid #ddd; }
+    th { background-color: #f8f9fa; color: #555; }
+    .badge { padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; color: white; display: inline-block; }
+    .badge-aman { background-color: #28a745; }
+    .badge-siaga { background-color: #ffc107; color: #333; }
+    .badge-bahaya { background-color: #dc3545; }
   </style>
 </head>
-
 <body>
 
   <div class="header">
@@ -121,25 +32,31 @@
   </div>
 
   <div class="grid-container">
-    <!-- Grafik 1: Gerakan Tanah -->
+    <!-- Grafik 1: Kemiringan Lereng (Pilihan 2) -->
     <div class="card">
-      <h2>📉 Histori Gerakan / Getaran Tanah (Akselerasi m/s²)</h2>
+      <h2>📐 Histori Kemiringan Lereng / Pitch (Derajat °)</h2>
+      <canvas id="chartPitch"></canvas>
+    </div>
+
+    <!-- Grafik 2: Gerakan Tanah -->
+    <div class="card">
+      <h2>📉 Histori Getaran Tanah (Akselerasi m/s²)</h2>
       <canvas id="chartAccel"></canvas>
     </div>
 
-    <!-- Grafik 2: Kelembapan Tanah -->
+    <!-- Grafik 3: Kelembapan Tanah -->
     <div class="card">
       <h2>💧 Histori Kelembapan Tanah (ADC)</h2>
       <canvas id="chartSoil"></canvas>
     </div>
 
-    <!-- Grafik 3: Suhu Perangkat -->
+    <!-- Grafik 4: Suhu Perangkat -->
     <div class="card">
       <h2>🌡️ Histori Suhu Perangkat (°C)</h2>
       <canvas id="chartTemp"></canvas>
     </div>
 
-    <!-- Grafik 4: Tingkat Bahaya -->
+    <!-- Grafik 5: Tingkat Bahaya -->
     <div class="card">
       <h2>⚠️ Histori Level Bahaya (0=Aman, 1=Siaga, 2=Bahaya)</h2>
       <canvas id="chartDanger"></canvas>
@@ -153,71 +70,69 @@
       <thead>
         <tr>
           <th>Waktu</th>
-          <th>Status Bahaya</th>
+          <th>Status</th>
+          <th>ESP1 Pitch</th>
           <th>ESP1 Accel</th>
           <th>ESP1 Soil</th>
-          <th>ESP2 Accel</th>
-          <th>ESP2 Soil</th>
+          <th>ESP3 Pitch</th>
+          <th>ESP3 Accel</th>
+          <th>ESP3 Soil</th>
         </tr>
       </thead>
       <tbody id="tableBody">
-        <tr>
-          <td colspan="6" style="text-align: center;">Memuat data dari Firebase...</td>
-        </tr>
+        <tr><td colspan="8" style="text-align: center;">Memuat data dari Firebase...</td></tr>
       </tbody>
     </table>
   </div>
 
   <script>
-    // =====================================================
-    // GANTI DENGAN URL DATABASE FIREBASE MILIKMU
-    // =====================================================
     const FIREBASE_URL = "https://galacticlongsor-default-rtdb.firebaseio.com/sensor_logs.json";
 
-    let chartAccel, chartSoil, chartTemp, chartDanger;
+    let chartPitch, chartAccel, chartSoil, chartTemp, chartDanger;
 
     function initCharts() {
+      const ctxPitch = document.getElementById('chartPitch').getContext('2d');
+      chartPitch = new Chart(ctxPitch, {
+        type: 'line',
+        data: { labels: [], datasets: [
+          { label: 'ESP1 Pitch (°)', borderColor: '#e74c3c', data: [], fill: false },
+          { label: 'ESP3 Pitch (°)', borderColor: '#3498db', data: [], fill: false }
+        ]}
+      });
+
       const ctxAccel = document.getElementById('chartAccel').getContext('2d');
       chartAccel = new Chart(ctxAccel, {
         type: 'line',
-        data: {
-          labels: [], datasets: [
-            { label: 'ESP1 ', borderColor: '#e74c3c', data: [], fill: false },
-            { label: 'ESP2', borderColor: '#3498db', data: [], fill: false }
-          ]
-        }
+        data: { labels: [], datasets: [
+          { label: 'ESP1 Accel', borderColor: '#e67e22', data: [], fill: false },
+          { label: 'ESP3 Accel', borderColor: '#9b59b6', data: [], fill: false }
+        ]}
       });
 
       const ctxSoil = document.getElementById('chartSoil').getContext('2d');
       chartSoil = new Chart(ctxSoil, {
         type: 'line',
-        data: {
-          labels: [], datasets: [
-            { label: 'ESP1 Soil', borderColor: '#2ecc71', data: [], fill: false },
-            { label: 'ESP2 Soil', borderColor: '#f1c40f', data: [], fill: false }
-          ]
-        }
+        data: { labels: [], datasets: [
+          { label: 'ESP1 Soil', borderColor: '#2ecc71', data: [], fill: false },
+          { label: 'ESP3 Soil', borderColor: '#f1c40f', data: [], fill: false }
+        ]}
       });
 
       const ctxTemp = document.getElementById('chartTemp').getContext('2d');
       chartTemp = new Chart(ctxTemp, {
         type: 'line',
-        data: {
-          labels: [], datasets: [
-            { label: 'ESP1 Temp', borderColor: '#9b59b6', data: [], fill: false },
-            { label: 'ESP2 Temp', borderColor: '#e67e22', data: [], fill: false }
-          ]
-        }
+        data: { labels: [], datasets: [
+          { label: 'ESP1 Temp', borderColor: '#1abc9c', data: [], fill: false },
+          { label: 'ESP3 Temp', borderColor: '#34495e', data: [], fill: false }
+        ]}
       });
 
       const ctxDanger = document.getElementById('chartDanger').getContext('2d');
       chartDanger = new Chart(ctxDanger, {
         type: 'bar',
-        data: {
-          labels: [], datasets: [
-            { label: 'Level Bahaya', backgroundColor: '#e74c3c', data: [] }
-          ]
-        },
+        data: { labels: [], datasets: [
+          { label: 'Level Bahaya', backgroundColor: '#e74c3c', data: [] }
+        ]},
         options: { scales: { y: { min: 0, max: 2, ticks: { stepSize: 1 } } } }
       });
     }
@@ -226,29 +141,32 @@
       try {
         const res = await fetch(FIREBASE_URL);
         const data = await res.json();
-
+        
         if (!data) return;
 
         const labels = [];
-        const esp1Accel = [], esp2Accel = [];
-        const esp1Soil = [], esp2Soil = [];
-        const esp1Temp = [], esp2Temp = [];
+        const esp1Pitch = [], esp3Pitch = [];
+        const esp1Accel = [], esp3Accel = [];
+        const esp1Soil = [], esp3Soil = [];
+        const esp1Temp = [], esp3Temp = [];
         const levelBahaya = [];
-
+        
         const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
 
-        const keys = Object.keys(data).slice(-20); // Ambil 20 data terbaru
+        const keys = Object.keys(data).slice(-20);
 
         keys.forEach(key => {
           const item = data[key];
           labels.push(item.waktu || 'N/A');
+          esp1Pitch.push(item.esp1_pitch || 0);
+          esp3Pitch.push(item.esp2_pitch || 0);
           esp1Accel.push(item.esp1_accel || 0);
-          esp2Accel.push(item.esp2_accel || 0);
+          esp3Accel.push(item.esp2_accel || 0);
           esp1Soil.push(item.esp1_soil || 0);
-          esp2Soil.push(item.esp2_soil || 0);
+          esp3Soil.push(item.esp2_soil || 0);
           esp1Temp.push(item.esp1_temp || 0);
-          esp2Temp.push(item.esp2_temp || 0);
+          esp3Temp.push(item.esp2_temp || 0);
           levelBahaya.push(item.level_bahaya || 0);
 
           let badgeClass = 'badge-aman';
@@ -258,27 +176,34 @@
           const row = `<tr>
             <td>${item.waktu || '-'}</td>
             <td><span class="badge ${badgeClass}">${item.status_bahaya || 'AMAN'}</span></td>
+            <td>${item.esp1_pitch || 0}°</td>
             <td>${item.esp1_accel || 0} m/s²</td>
             <td>${item.esp1_soil || 0} ADC</td>
+            <td>${item.esp2_pitch || 0}°</td>
             <td>${item.esp2_accel || 0} m/s²</td>
             <td>${item.esp2_soil || 0} ADC</td>
           </tr>`;
           tableBody.innerHTML = row + tableBody.innerHTML;
         });
 
+        chartPitch.data.labels = labels;
+        chartPitch.data.datasets[0].data = esp1Pitch;
+        chartPitch.data.datasets[1].data = esp3Pitch;
+        chartPitch.update();
+
         chartAccel.data.labels = labels;
         chartAccel.data.datasets[0].data = esp1Accel;
-        chartAccel.data.datasets[1].data = esp2Accel;
+        chartAccel.data.datasets[1].data = esp3Accel;
         chartAccel.update();
 
         chartSoil.data.labels = labels;
         chartSoil.data.datasets[0].data = esp1Soil;
-        chartSoil.data.datasets[1].data = esp2Soil;
+        chartSoil.data.datasets[1].data = esp3Soil;
         chartSoil.update();
 
         chartTemp.data.labels = labels;
         chartTemp.data.datasets[0].data = esp1Temp;
-        chartTemp.data.datasets[1].data = esp2Temp;
+        chartTemp.data.datasets[1].data = esp3Temp;
         chartTemp.update();
 
         chartDanger.data.labels = labels;
@@ -293,9 +218,8 @@
     window.onload = () => {
       initCharts();
       loadFirebaseData();
-      setInterval(loadFirebaseData, 5000); // Otomatis refresh data tiap 5 detik
+      setInterval(loadFirebaseData, 5000);
     };
   </script>
 </body>
-
 </html>
