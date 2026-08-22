@@ -16,9 +16,26 @@
       padding: 20px; 
       border-radius: 12px; 
       box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+      position: relative;
     }
     .header h1 { color: #2c3e50; margin-bottom: 8px; font-size: 22px; }
-    .header p { color: #7f8c8d; font-size: 14px; }
+    .header p { color: #7f8c8d; font-size: 14px; margin-bottom: 12px; }
+    
+    /* Tombol Reset Data */
+    .btn-reset {
+      background-color: #ff4757;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.2s ease-in-out;
+    }
+    .btn-reset:hover {
+      background-color: #ff6b81;
+    }
     
     .grid-container { 
       display: grid; 
@@ -48,7 +65,13 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
       overflow-x: auto; 
     }
-    .table-container h2 { font-size: 16px; margin-bottom: 15px; color: #2c3e50; }
+    .table-header-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .table-header-box h2 { font-size: 16px; color: #2c3e50; }
     
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
     th, td { padding: 10px 12px; border-bottom: 1px solid #eef2f5; white-space: nowrap; }
@@ -74,6 +97,7 @@
   <div class="header">
     <h1>🚨 SISTEM EARLY WARNING SYSTEM LONGSOR & GEMPA BUMI</h1>
     <p>Monitoring Realtime Terintegrasi LoRa, ESP-NOW, Telegram & Firebase Cloud</p>
+    <button onclick="resetData()" class="btn-reset">🗑️ Reset Semua Data</button>
   </div>
 
   <div class="grid-container">
@@ -110,7 +134,10 @@
 
   <!-- Tabel Riwayat Data -->
   <div class="table-container">
-    <h2>📋 Riwayat Log Diagnosa Bencana</h2>
+    <div class="table-header-box">
+      <h2>📋 Riwayat Log Diagnosa Bencana</h2>
+      <button onclick="resetData()" class="btn-reset">🗑️ Reset Semua Data</button>
+    </div>
     <table>
       <thead>
         <tr>
@@ -158,8 +185,8 @@
       chartSoil = new Chart(ctxSoil, {
         type: 'line',
         data: { labels: [], datasets: [
-          { label: 'ESP1 Soil', borderColor: '#2ed573', data: [], fill: false, tension: 0.2 },
-          { label: 'ESP3 Soil', borderColor: '#eccc68', data: [], fill: false, tension: 0.2 }
+          { label: 'ESP1 Soil (%)', borderColor: '#2ed573', data: [], fill: false, tension: 0.2 },
+          { label: 'ESP3 Soil (%)', borderColor: '#eccc68', data: [], fill: false, tension: 0.2 }
         ]}
       });
 
@@ -187,7 +214,13 @@
         const res = await fetch(FIREBASE_URL);
         const data = await res.json();
         
-        if (!data) return;
+        const tableBody = document.getElementById('tableBody');
+
+        if (!data) {
+          tableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">Data kosong. Menunggu data baru dari sensor...</td></tr>';
+          clearChartsUI();
+          return;
+        }
 
         const labels = [];
         const esp1Pitch = [], esp3Pitch = [];
@@ -196,7 +229,6 @@
         const esp1Temp = [], esp3Temp = [];
         const levelBahaya = [];
         
-        const tableBody = document.getElementById('tableBody');
         tableBody.innerHTML = '';
 
         const keys = Object.keys(data).slice(-20); // Ambil 20 log data terbaru
@@ -216,14 +248,13 @@
           esp3Temp.push(item.esp2_temp || 0);
           levelBahaya.push(item.level_bahaya || 0);
 
-          // Penentuan Warna Badge Berdasarkan Diagnosa Bencana
           let badgeClass = 'badge-aman';
           if (statusText.includes("GEMPA")) {
-            badgeClass = 'badge-gempa'; // Ungu
+            badgeClass = 'badge-gempa';
           } else if (item.level_bahaya === 2 || statusText.includes("BAHAYA")) {
-            badgeClass = 'badge-bahaya'; // Merah
+            badgeClass = 'badge-bahaya';
           } else if (item.level_bahaya === 1 || statusText.includes("SIAGA")) {
-            badgeClass = 'badge-siaga'; // Oranye
+            badgeClass = 'badge-siaga';
           }
 
           const row = `<tr>
@@ -231,15 +262,14 @@
             <td><span class="badge ${badgeClass}">${statusText}</span></td>
             <td>${item.esp1_pitch || 0}°</td>
             <td>${item.esp1_accel || 0} m/s²</td>
-            <td>${item.esp1_soil || 0} ADC</td>
+            <td>${item.esp1_soil || 0}%</td>
             <td>${item.esp2_pitch || 0}°</td>
             <td>${item.esp2_accel || 0} m/s²</td>
-            <td>${item.esp2_soil || 0} ADC</td>
+            <td>${item.esp2_soil || 0}%</td>
           </tr>`;
           tableBody.innerHTML = row + tableBody.innerHTML;
         });
 
-        // Update Data Grafik
         chartPitch.data.labels = labels;
         chartPitch.data.datasets[0].data = esp1Pitch;
         chartPitch.data.datasets[1].data = esp3Pitch;
@@ -269,10 +299,41 @@
       }
     }
 
+    function clearChartsUI() {
+      chartPitch.data.labels = []; chartPitch.data.datasets[0].data = []; chartPitch.data.datasets[1].data = []; chartPitch.update();
+      chartAccel.data.labels = []; chartAccel.data.datasets[0].data = []; chartAccel.data.datasets[1].data = []; chartAccel.update();
+      chartSoil.data.labels = []; chartSoil.data.datasets[0].data = []; chartSoil.data.datasets[1].data = []; chartSoil.update();
+      chartTemp.data.labels = []; chartTemp.data.datasets[0].data = []; chartTemp.data.datasets[1].data = []; chartTemp.update();
+      chartDanger.data.labels = []; chartDanger.data.datasets[0].data = []; chartDanger.update();
+    }
+
+    // FUNGSI UNTUK RESET / MENGHAPUS SEMUA DATA SENSOR DI FIREBASE
+    async function resetData() {
+      const konfirmasi = confirm("⚠️ Apakah Anda yakin ingin menghapus SELURUH riwayat data dari Firebase?\nData yang dihapus tidak dapat dikembalikan.");
+      if (!konfirmasi) return;
+
+      try {
+        const res = await fetch(FIREBASE_URL, {
+          method: 'DELETE'
+        });
+
+        if (res.ok) {
+          alert("✅ Seluruh data berhasil di-reset!");
+          document.getElementById('tableBody').innerHTML = '<tr><td colspan="8" style="text-align: center;">Data kosong. Menunggu data baru dari sensor...</td></tr>';
+          clearChartsUI();
+        } else {
+          alert("❌ Gagal menghapus data. Periksa Rules pada Firebase Database Anda.");
+        }
+      } catch (err) {
+        console.error("Error reset data:", err);
+        alert("❌ Terjadi kesalahan koneksi saat mereset data.");
+      }
+    }
+
     window.onload = () => {
       initCharts();
       loadFirebaseData();
-      setInterval(loadFirebaseData, 5000); // Auto refresh tiap 5 detik
+      setInterval(loadFirebaseData, 5000);
     };
   </script>
 </body>
