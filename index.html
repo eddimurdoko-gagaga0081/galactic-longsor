@@ -158,7 +158,7 @@
   </div>
 
   <script>
-    const FIREBASE_URL = "https://galacticlongsor-default-rtdb.firebaseio.com/sensor_logs.json";
+    const FIREBASE_URL = "https://galacticlongsor-default-rtdb.firebaseio.com/sensor_logs.json?orderBy=\"$key\"&limitToLast=20";
 
     let chartPitch, chartAccel, chartSoil, chartTemp, chartDanger;
 
