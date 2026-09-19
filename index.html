@@ -158,7 +158,7 @@
   </div>
 
   <script>
-    const FIREBASE_URL = "https://galacticlongsor-default-rtdb.firebaseio.com/sensor_logs.json?orderBy=\"$key\"&limitToLast=20";
+    const FIREBASE_URL = "https://galacticlongsor-default-rtdb.firebaseio.com/sensor_logs.json";
 
     let chartPitch, chartAccel, chartSoil, chartTemp, chartDanger;
 
@@ -209,7 +209,7 @@
       });
     }
 
-    async function loadFirebaseData() {
+    <!-- async function loadFirebaseData() {
       try {
         const res = await fetch(FIREBASE_URL);
         const data = await res.json();
@@ -297,7 +297,7 @@
       } catch (err) {
         console.error("Gagal mengambil data dari Firebase:", err);
       }
-    }
+    } -->
 
     function clearChartsUI() {
       chartPitch.data.labels = []; chartPitch.data.datasets[0].data = []; chartPitch.data.datasets[1].data = []; chartPitch.update();
